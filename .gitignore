@@ -1,0 +1,8 @@
+*.class
+*.log
+
+.idea/
+project/
+target/
+spark-warehouse/
+
