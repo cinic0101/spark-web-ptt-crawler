@@ -33,9 +33,12 @@ object Crawler {
           case None => ""
         }
 
-        (id, title._1, title._2, domain.value + link)
-      })
+        val date = x.select("div.meta > div.date").text
+        val author = x.select("div.meta > div.author").text
 
+        (date, id, author, title._1, title._2, if(link.isEmpty) "" else domain.value + link)
+      })
+      
       links.foreach(println)
     })
   }
