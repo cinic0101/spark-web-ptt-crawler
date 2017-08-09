@@ -11,7 +11,7 @@ object Crawler {
     val sc = sparkSession.sparkContext
 
     val domain = sc.broadcast("https://www.ptt.cc")
-    val titleRegex = sc.broadcast("""\[(?<category>.+)\]\s?(?<title>.+)""".r)
+    val titleRegex = sc.broadcast("""(?<reply>Re:)?\s*\[(?<category>.+)\]\s*(?<title>.+)""".r)
     val linkRegex = sc.broadcast("""/bbs\/\S+\/(?<id>\S+)\.html""".r)
 
     val urls = sc.textFile(args(0))
@@ -24,9 +24,10 @@ object Crawler {
         val titleText = titleLink.text
         val link = titleLink.attr("href")
 
+
         val title = titleRegex.value.findFirstMatchIn(titleText) match {
-          case Some(m) => (m.group(1), m.group(2))
-          case None => ("", titleText)
+          case Some(m) => (if(m.group(1) != null) 1 else 0, m.group(2), m.group(3))
+          case None => (0, "", titleText)
         }
         val id = linkRegex.value.findFirstMatchIn(link) match {
           case Some(m) => m.group(1)
@@ -36,9 +37,10 @@ object Crawler {
         val date = x.select("div.meta > div.date").text
         val author = x.select("div.meta > div.author").text
 
-        (date, id, author, title._1, title._2, if(link.isEmpty) "" else domain.value + link)
+        (title._1, date, id, author, title._2, title._3, if(link.isEmpty) "" else domain.value + link)
       })
-      
+
+
       links.foreach(println)
     })
   }
