@@ -25,7 +25,7 @@ object DateIndexScanner {
       case None => "1"
     }
 
-    val begin = 1
+    val begin = 20000 // It should be 1
     val last = lastIndex.toInt
     val indexes = sc.parallelize(begin to last)
 
