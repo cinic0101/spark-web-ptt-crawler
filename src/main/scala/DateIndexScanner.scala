@@ -1,6 +1,6 @@
 import java.time.LocalDate
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
 import org.jsoup.Jsoup
 
@@ -40,6 +40,6 @@ object DateIndexScanner {
 
     val now = LocalDate.now
     val path = s"src/main/resources/$board-index-$now"
-    groupMappings.orderBy(groupMappings("index")).rdd.coalesce(1).saveAsTextFile(path)
+    groupMappings.orderBy(groupMappings("index")).coalesce(1).write.mode(SaveMode.Overwrite).csv(path)
   }
 }
