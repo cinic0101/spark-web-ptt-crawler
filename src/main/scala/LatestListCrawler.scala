@@ -20,6 +20,7 @@ object LatestListCrawler {
     val doc = Jsoup.connect(url).cookie("over18", "1").get()
 
     val latest = doc.select("div.r-ent").iterator().asScala.map(x => {
+      val niceCount = x.select("div.nrec > span.hl").text
       val titleLink = x.select("div.title > a")
       val titleText = titleLink.text
       val link = titleLink.attr("href")
@@ -36,7 +37,7 @@ object LatestListCrawler {
       val date = x.select("div.meta > div.date").text
       val author = x.select("div.meta > div.author").text
 
-      Row(title._1, date, id, author, title._2, title._3, if(link.isEmpty) "" else domain.value + link)
+      Row(niceCount, title._1, date, id, author, title._2, title._3, if(link.isEmpty) "" else domain.value + link)
     }).toList.toDF
 
     latest.show()
